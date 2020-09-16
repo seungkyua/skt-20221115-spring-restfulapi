@@ -19,5 +19,14 @@ export JAVA_HOME PATH CLASSPATH
   ```
 3. maven 설치
   ```
-$ yum install -y maven  
+$ wget http://www-eu.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
+$ sudo tar xzf apache-maven-3.6.3-bin.tar.gz
+$ sudo ln -s apache-maven-3.6.3  maven
+$ vi /etc/profile.d/maven.sh
+  ```
+  ```
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.242.b08-0.el7_7.x86_64
+export MAVEN_HOME=/root/maven
+export PATH=${MAVEN_HOME}/bin:${PATH}
+  
   ```

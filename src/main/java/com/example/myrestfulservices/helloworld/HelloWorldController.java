@@ -23,8 +23,8 @@ public class HelloWorldController {
 
     @GetMapping(path = "/hello-world")
     public String helloWorld() throws Exception {
-        String ip = InetAddress.getLoopbackAddress().getHostAddress();
-        String hostname = InetAddress.getLoopbackAddress().getHostName();
+        String ip = InetAddress.getLocalHost().getHostAddress();
+        String hostname = InetAddress.getLocalHost().getHostName();
 
         log.debug("Local host address: {}", InetAddress.getLocalHost().getHostAddress());
         log.debug("Local host name: {}", InetAddress.getLocalHost().getHostName());

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.InetAddress;
+import java.util.Date;
 import java.util.Locale;
 
 @RestController
@@ -20,9 +22,14 @@ public class HelloWorldController {
     private MessageSource messageSource;
 
     @GetMapping(path = "/hello-world")
-    public String helloWorld() {
-        log.debug("Hello World");
-        return "Hello World";
+    public String helloWorld() throws Exception {
+        String ip = InetAddress.getLoopbackAddress().getHostAddress();
+        String hostname = InetAddress.getLoopbackAddress().getHostName();
+
+        log.debug("Local host address: {}", InetAddress.getLocalHost().getHostAddress());
+        log.debug("Local host name: {}", InetAddress.getLocalHost().getHostName());
+
+        return String.format("Hello World, %s, %s, %s", ip, hostname, new Date(System.currentTimeMillis()));
     }
 
     @GetMapping(path = "/hello-world-bean")

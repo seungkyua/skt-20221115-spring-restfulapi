@@ -1,0 +1,32 @@
+server:
+  port: 8088
+logging:
+  level:
+    root: info
+    org.springframework: debug
+
+spring:
+  messages:
+    basename: messages_en
+    fallback-to-system-locale: false
+
+  devtools:
+    livereload:
+      enabled: true
+
+  #  security:
+  #    user:
+  #      name: username
+  #      password: passw0rd
+
+  jpa:
+    show-sql: true
+  h2:
+    console:
+      enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

@@ -8,7 +8,8 @@ $ yum install java-1.8.0-openjdk
 $ yum install java-1.8.0-openjdk-devel
 $ readlink -f /usr/bin/java
   /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.262.b10-0.1.al7.x86_64/jre/bin/java
-$ vi /etc/profile 수정
+$ vi /etc/profile 수정 
+$ source /etc/profile
   ```
   ```
 JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.242.b08-0.el7_7.x86_64
@@ -23,6 +24,7 @@ $ wget http://www-eu.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3
 $ sudo tar xzf apache-maven-3.6.3-bin.tar.gz
 $ sudo ln -s apache-maven-3.6.3  maven
 $ vi /etc/profile.d/maven.sh
+$ source /etc/profile.d/maven.sh
   ```
   ```
 export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.242.b08-0.el7_7.x86_64

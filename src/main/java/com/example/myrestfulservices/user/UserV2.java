@@ -11,11 +11,10 @@ import javax.validation.constraints.Size;
 import java.util.Date;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@JsonFilter("UserInfoV2")
+//@NoArgsConstructor
+//@AllArgsConstructor
+@JsonFilter("UserInfo")
 public class UserV2 extends User {
-
     private String grade;
 
 }

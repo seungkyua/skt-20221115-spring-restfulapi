@@ -1,6 +1,5 @@
 package com.example.myrestfulservices.helloworld;
 
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,15 +17,17 @@ import java.util.Date;
 import java.util.Locale;
 
 @RestController
-@Slf4j
 public class HelloWorldController {
+    private static final Logger log = LoggerFactory.getLogger(HelloWorldController.class);
+
+//    @Autowired
     private MessageSource messageSource;
-    private LocaleResolver resolver;
+    private LocaleResolver localeResolver;
 
     @Autowired
-    public HelloWorldController(MessageSource messageSource, LocaleResolver resolver) {
+    public HelloWorldController(MessageSource messageSource, LocaleResolver localeResolver) {
         this.messageSource = messageSource;
-        this.resolver = resolver;
+        this.localeResolver = localeResolver;
     }
 
     @GetMapping(path = "/hello-world")
@@ -34,10 +35,11 @@ public class HelloWorldController {
         String ip = InetAddress.getLocalHost().getHostAddress();
         String hostname = InetAddress.getLocalHost().getHostName();
 
-        log.debug("Local host address: {}", InetAddress.getLocalHost().getHostAddress());
-        log.debug("Local host name: {}", InetAddress.getLocalHost().getHostName());
-
-        return String.format("Hello World, %s, %s, %s", ip, hostname, new Date(System.currentTimeMillis()));
+//        log.debug("Local host address: {}", InetAddress.getLocalHost().getHostAddress());
+//        log.debug("Local host name: {}", InetAddress.getLocalHost().getHostName());
+//
+//        return String.format("Hello World, %s, %s, %s", ip, hostname, new Date(System.currentTimeMillis()));
+        throw new Exception("test");
     }
 
     @GetMapping(path = "/hello-world-bean")
@@ -52,15 +54,20 @@ public class HelloWorldController {
 
     @GetMapping(path = "/hello-world-internationalized")
     public String helloWorldInternationalized(
-            @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
+            @RequestHeader(name = "Accept-Language", required = false) Locale locale,
+            HttpServletRequest request) {
+        if (locale == null)
+            locale = localeResolver.resolveLocale(request);
+
         return messageSource.getMessage("greeting.message", null, locale);
     }
 
+
+
     @GetMapping(path = "/test-world-internationalized")
-    public String testWorldInternationalizedWithoutHeader(HttpServletRequest request) {
-        String acceptLanguage = request.getHeader("Accept-Language");
-        System.out.println(acceptLanguage);
-        Locale locale = resolver.resolveLocale(request);
+    public String testWorldInternationalized(
+            @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
+        System.out.println(locale.getLanguage());
         return messageSource.getMessage("greeting.message", null, locale);
     }
 
@@ -68,4 +75,5 @@ public class HelloWorldController {
     public String hiWorldInternationalized() {
         return messageSource.getMessage("greeting.message", null, LocaleContextHolder.getLocale());
     }
+
 }

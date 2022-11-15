@@ -5,31 +5,51 @@ logging:
     root: info
     org.springframework: info
 
+springfox:
+  documentation:
+    swagger:
+      v2:
+        use-model-v3: false
+
 spring:
   messages:
-    basename: messages_en
+    basename: messages
     fallback-to-system-locale: false
+
+  thymeleaf:
+    prefix: classpath:templates/
+    check-template-location: true
+    suffix: .html
+    mode: HTML5
+    cache: false
+    template-resolver-order: 0
 
   devtools:
     livereload:
       enabled: true
-
-  #  security:
-  #    user:
-  #      name: username
-  #      password: passw0rd
 
   jpa:
     show-sql: true
     generate-ddl: true
     hibernate:
       ddl-auto: update
+    defer-datasource-initialization: true
 
+  #  datasource:
+#    driverClassName: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://127.0.0.1:3306/mydb?serverTimezone=UTC
+#    username: root
+#    password: test1357
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     username: sa
     password:
+
+  #  security:
+  #    user:
+  #      name: username
+  #      password: passw0rd
 
   h2:
     console:
@@ -39,4 +59,5 @@ management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: health, beans, httptraces
+#        include=env,health,metrics:

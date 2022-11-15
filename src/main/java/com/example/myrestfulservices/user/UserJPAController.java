@@ -28,6 +28,12 @@ public class UserJPAController {
     private UserRepository userRepository;
 
     @Autowired
+    private UserRepositoryV5 userRepositoryV5;
+
+    public UserJPAController(PostRepository postRepository) {
+        this.postRepository = postRepository;
+    }
+
     private PostRepository postRepository;
 
     @GetMapping("/users")
@@ -67,6 +73,39 @@ public class UserJPAController {
                 .toUri();
 
         return ResponseEntity.created(location).build();
+    }
+
+    @PostMapping("/users-array")
+    public ResponseEntity<User> createUserArray(@Valid @RequestBody UserV5 user) {
+        UserV5 savedUser = userRepositoryV5.save(user);
+        // CREATED
+        // /users/4
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(savedUser.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).build();
+    }
+
+    @GetMapping("/users-array")
+    public List<UserV5> retrieveAllUsersV5() {
+        return userRepositoryV5.findAll();
+    }
+
+    @PutMapping("/users/{id}")
+    public ResponseEntity<Object> updateStudent(@RequestBody User user, @PathVariable int id) {
+        Optional<User> userOptional = userRepository.findById(id);
+
+        if (!userOptional.isPresent())
+            return ResponseEntity.notFound().build();
+
+        user.setId(id);
+
+        userRepository.save(user);
+
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/users/{id}/posts")

@@ -20,6 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 //@ApiModel(description = "사용자 상세 정보")
 @Entity
+@Table(name = "user")
 public class User {
     @Id
     @GeneratedValue

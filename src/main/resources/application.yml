@@ -1,9 +1,9 @@
 server:
-  port: 8088
+  port: 8089
 logging:
   level:
-    root: debug
-    org.springframework: debug
+    root: info
+    org.springframework: info
 
 spring:
   messages:
@@ -21,6 +21,16 @@ spring:
 
   jpa:
     show-sql: true
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password:
+
   h2:
     console:
       enabled: true

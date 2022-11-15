@@ -2,6 +2,7 @@ package com.example.myrestfulservices.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 //import springfox.documentation.service.ApiInfo;
 //import springfox.documentation.service.Contact;
 //import springfox.documentation.spi.DocumentationType;
@@ -33,4 +34,5 @@ public class SwaggerConfig {
 //                .consumes(DEFAULT_PRODUCES_AND_CONSUMES)
 //                ;
 //    }
+
 }

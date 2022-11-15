@@ -7,9 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.Resources;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+//import org.springframework.hateoas.Resource;
+//import org.springframework.hateoas.Resources;
+//import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
@@ -21,13 +21,23 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+//import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+//import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 public class UserController {
-    @Autowired
+//    @Autowired
     private UserDaoService service;
+
+    public UserController(UserDaoService service) {
+        this.service = service;
+    }
 
     @GetMapping("/users")
     public List<User> retrieveAllUsers() {
@@ -35,40 +45,55 @@ public class UserController {
         return users;
     }
 
+//    @GetMapping("/users2")
+//    public Resources<Resource<User>> retrieveUserList() {
+//        List<Resource<User>> result = new ArrayList<>();
+//        List<User> users = service.findAll();
+//
+//        for (User user : users) {
+//            Resource<User> resource = new Resource<>(user);
+//            ControllerLinkBuilder linkTo = linkTo(methodOn(this.getClass()).retrieveAllUsers());
+//            resource.add(linkTo.withRel("all-users"));
+//
+//            result.add(resource);
+//        }
+//
+//        return new Resources(result);
+//    }
+
+    // 전체 사용자 목록
     @GetMapping("/users2")
-    public Resources<Resource<User>> retrieveUserList() {
-        List<Resource<User>> result = new ArrayList<>();
+    public ResponseEntity<CollectionModel<EntityModel<User>>> retrieveUserList2() {
+        List<EntityModel<User>> result = new ArrayList<>();
         List<User> users = service.findAll();
 
         for (User user : users) {
-            Resource<User> resource = new Resource<>(user);
-            ControllerLinkBuilder linkTo = linkTo(methodOn(this.getClass()).retrieveAllUsers());
-            resource.add(linkTo.withRel("all-users"));
+            EntityModel entityModel = EntityModel.of(user);
+            entityModel.add(linkTo(methodOn(this.getClass()).retrieveAllUsers()).withSelfRel());
 
-            result.add(resource);
+            result.add(entityModel);
         }
 
-        return new Resources(result);
+        return ResponseEntity.ok(CollectionModel.of(result, linkTo(methodOn(this.getClass()).retrieveAllUsers()).withSelfRel()));
     }
 
+    // 사용자 상세 정보
     @GetMapping("/users/{id}")
-    public Resource<User> retrieveUser(@PathVariable int id) {
+    public ResponseEntity<EntityModel<User>> retrieveUser(@PathVariable int id) {
         User user = service.findOne(id);
 
         if (user == null) {
             throw new UserNotFoundException("id-" + id);
         }
 
-        Resource<User> resource = new Resource<>(user);
-        ControllerLinkBuilder linkTo = linkTo(methodOn(this.getClass()).retrieveAllUsers());
-        resource.add(linkTo.withRel("all-users"));
-        return resource;
+        EntityModel entityModel = EntityModel.of(user);
+
+        WebMvcLinkBuilder linkTo = linkTo(methodOn(this.getClass()).retrieveAllUsers());
+        entityModel.add(linkTo.withRel("all-users"));
+        return ResponseEntity.ok(entityModel);
     }
 
-//    @GetMapping("/v1/admin/users/{id}")
-    @GetMapping(value = "/admin/users/{id}/", params = {"version=1","api=v1"})
-//    @GetMapping(value = "/admin/users/{id}", headers = "X-API-VERSION=1")
-//    @GetMapping(value = "/admin/users/{id}", produces = "application/vnd.company.appv1+json")
+    @GetMapping("/v1/admin/users/{id}")
     public MappingJacksonValue retrieveUser4AdminV1(@PathVariable int id) {
         User user = service.findOne(id);
 
@@ -86,12 +111,8 @@ public class UserController {
         return mapping;
     }
 
-//    @GetMapping("/v2/admin/users/{id}")
-    @GetMapping(value = "/admin/users/{id}/", params = {"version=1","api=v2"})
-//    @GetMapping(value = "/admin/users/{id}", headers = "X-API-VERSION=2")
-//    @GetMapping(value = "/admin/users/{id}", produces = "application/vnd.company.appv2+json")
-    public MappingJacksonValue retrieveUser4AdminV2(@PathVariable int id,
-                                                 HttpServletRequest request) {
+    @GetMapping("/v2/admin/users/{id}")
+    public MappingJacksonValue retrieveUser4AdminV2(@PathVariable int id) {
         User user = service.findOne(id);
 
         if (user == null) {
@@ -99,21 +120,23 @@ public class UserController {
         }
 
         UserV2 userV2 = new UserV2();
-        BeanUtils.copyProperties(user, userV2);
-        userV2.setGrade("VIP");
+        userV2.setId(user.getId());
+        userV2.setName(user.getName());
+        userV2.setJoinDate(user.getJoinDate());
 
-        Resource<UserV2> resource = new Resource<>(userV2);
-        ControllerLinkBuilder linkTo = linkTo(methodOn(this.getClass()).retrieveAllUsers());
-        resource.add(linkTo.withRel("all-users"));
+        EntityModel<User> model = EntityModel.of(userV2);
+        WebMvcLinkBuilder linkTo = linkTo(methodOn(this.getClass()).retrieveAllUsers());
+        model.add(linkTo.withRel("all-users"));
+        model.add(linkTo.withRel("update-user"));
 
-        SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter.filterOutAllExcept("id", "name", "joinDate", "grade");
-        FilterProvider filters = new SimpleFilterProvider().addFilter("UserInfoV2", filter);
+        SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter.filterOutAllExcept("id", "name", "joinDate");
 
-        MappingJacksonValue mapping = new MappingJacksonValue(resource);
+        FilterProvider filters = new SimpleFilterProvider().addFilter("UserInfo", filter);
+
+        MappingJacksonValue mapping = new MappingJacksonValue(model);
         mapping.setFilters(filters);
 
         return mapping;
-
     }
 
     @GetMapping("/admin/users")
@@ -131,7 +154,7 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+    public ResponseEntity<User> createUser(@Valid @RequestBody  User user) {
         User savedUser = service.save(user);
 
         URI location = ServletUriComponentsBuilder
@@ -151,4 +174,5 @@ public class UserController {
             throw new UserNotFoundException("id-" + id);
         }
     }
+
 }

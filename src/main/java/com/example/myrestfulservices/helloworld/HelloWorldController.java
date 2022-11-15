@@ -1,5 +1,6 @@
 package com.example.myrestfulservices.helloworld;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,17 +10,24 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.LocaleResolver;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.util.Date;
 import java.util.Locale;
 
 @RestController
+@Slf4j
 public class HelloWorldController {
-    private static final Logger log = LoggerFactory.getLogger(HelloWorldController.class);
+    private MessageSource messageSource;
+    private LocaleResolver resolver;
 
     @Autowired
-    private MessageSource messageSource;
+    public HelloWorldController(MessageSource messageSource, LocaleResolver resolver) {
+        this.messageSource = messageSource;
+        this.resolver = resolver;
+    }
 
     @GetMapping(path = "/hello-world")
     public String helloWorld() throws Exception {
@@ -48,12 +56,11 @@ public class HelloWorldController {
         return messageSource.getMessage("greeting.message", null, locale);
     }
 
-
-
     @GetMapping(path = "/test-world-internationalized")
-    public String testWorldInternationalized(
-            @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
-        System.out.println(locale.getLanguage());
+    public String testWorldInternationalizedWithoutHeader(HttpServletRequest request) {
+        String acceptLanguage = request.getHeader("Accept-Language");
+        System.out.println(acceptLanguage);
+        Locale locale = resolver.resolveLocale(request);
         return messageSource.getMessage("greeting.message", null, locale);
     }
 
